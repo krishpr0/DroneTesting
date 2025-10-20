@@ -5,11 +5,11 @@
 #include <Wire.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_BMP280.h>
-#include <Adafruit_HMC5883_Unified.h>
+#include <Adafruit_HMC5883_U.h>
 #include <TinyGPS++.h>
 #include <PID_v1.h>
 #include <ESP32Servo.h>
-#include <sbus/SBUS.h>
+#include <sbus.h>
 #include <MadgwickAHRS.h>
 #include <EEPROM.h>
 #include "config.h"

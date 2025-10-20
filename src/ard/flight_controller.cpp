@@ -1,11 +1,5 @@
 #include "flight_controller.h"
 
-Adafruit_MPU6050 mpu;
-Adafruit_BMP280 bmp;
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-TinyGPSPlus gps;
-HardwareSerial GPSSerial(1);
-
 void setup() {
   Serial.begin(115200);
   EEPROM.begin(512);
@@ -55,7 +49,7 @@ void initializeSensors() {
     Serial.println("BMP280 not found");
     while (1);
   }
-  bmp.setSampling(BMP_MODE, BMP_TEMP_OVERSAMPLING, BMP_PRESSURE_OVERSAMPLING, BMP_FILTER, BMP_STANDBY_MS);
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL, Adafruit_BMP280::SAMPLING_X2, Adafruit_BMP280::SAMPLING_X16, Adafruit_BMP280::FILTER_OFF, Adafruit_BMP280::STANDBY_MS_1000);
 
   if (!mag.begin()) {
     Serial.println("HMC5883L not found");
@@ -268,7 +262,7 @@ void handleMSP() {
       uint8_t resp[32];
       uint8_t resp_size = 0;
       switch (cmd) {
-        case 30: // MSP_ATTITUDE
+        case 30: { // MSP_ATTITUDE
           resp_size = 6;
           int16_t roll = (int16_t)(rollInput * 10);
           int16_t pitch = (int16_t)(pitchInput * 10);
@@ -277,11 +271,13 @@ void handleMSP() {
           memcpy(resp + 2, &pitch, 2);
           memcpy(resp + 4, &yaw, 2);
           break;
-        case 101: // MSP_STATUS
+        }
+        case 101: { // MSP_STATUS
           resp_size = 2;
           resp[0] = isArmed ? 1 : 0;
           resp[1] = (uint8_t)currentMode;
           break;
+        }
       }
       if (resp_size > 0) {
         uint8_t resp_crc = 0x58 ^ 1 ^ resp_size ^ cmd;
